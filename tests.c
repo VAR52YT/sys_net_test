@@ -3,6 +3,9 @@
 #include <string.h>
 #include <sys/timer.h>
 #include <cell/atomic.h>
+#include <sys/poll.h>
+#include <sys/select.h>
+#include <sys/time.h>
 #include <sys/ppu_thread.h>
 
 #include "test_parameters.h"
@@ -81,6 +84,46 @@ void server_thread(uint64_t arg)
 
 		printf("[Server] Accepted a client\n");
 
+		if (tparams->test_poll)
+		{
+			struct pollfd pfds[1];
+			pfds[0].fd = s_client;
+			pfds[0].events = POLLIN;
+			pfds[0].revents = 0;
+			ret = socketpoll(pfds, 1, 5000);
+
+			if (ret <= 0)
+			{
+				printf("[Server] Poll failed: %d\n", sys_net_errno);
+				ret_value = -1;
+				goto cleanup;
+			}
+
+			printf("[Server] Poll succeeded\n");
+		}
+
+		if (tparams->test_select)
+		{
+			struct fd_set fds;
+			FD_ZERO(&fds);
+			FD_SET(s_client, &fds);
+
+			struct timeval tv;
+			memset(&tv, 0, sizeof(tv));
+			tv.tv_sec = 5;
+			tv.tv_usec = 0;
+
+			ret = socketselect(s_client + 1, &fds, NULL, NULL, &tv);
+			if (ret <= 0)
+			{
+				printf("[Server] Select failed: %d\n", sys_net_errno);
+				ret_value = -1;
+				goto cleanup;
+			}
+
+			printf("[Server] Select succeeded\n");
+		}
+
 		ret = recvn(s_client, buf, 100);
 		if (ret < 0)
 		{
@@ -104,6 +147,46 @@ void server_thread(uint64_t arg)
 	else
 	{
 		cellAtomicStore64(&atomic_state, 1);
+
+		if (tparams->test_poll)
+		{
+			struct pollfd pfds[1];
+			pfds[0].fd = s_server;
+			pfds[0].events = POLLIN;
+			pfds[0].revents = 0;
+			ret = socketpoll(pfds, 1, 5000);
+
+			if (ret <= 0)
+			{
+				printf("[Server] Poll failed: %d\n", sys_net_errno);
+				ret_value = -1;
+				goto cleanup;
+			}
+
+			printf("[Server] Poll succeeded\n");
+		}
+
+		if (tparams->test_select)
+		{
+			struct fd_set fds;
+			FD_ZERO(&fds);
+			FD_SET(s_server, &fds);
+
+			struct timeval tv;
+			memset(&tv, 0, sizeof(tv));
+			tv.tv_sec = 5;
+			tv.tv_usec = 0;
+
+			ret = socketselect(s_server + 1, &fds, NULL, NULL, &tv);
+			if (ret <= 0)
+			{
+				printf("[Server] Select failed: %d\n", sys_net_errno);
+				ret_value = -1;
+				goto cleanup;
+			}
+
+			printf("[Server] Select succeeded\n");
+		}
 
 		struct sockaddr source_addr;
 		socklen_t addr_len = sizeof(source_addr);

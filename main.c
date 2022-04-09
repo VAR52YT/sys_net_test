@@ -6,11 +6,14 @@
 
 int run_test(char *name, test_parameters *tparams);
 
+#define TEST_POLL 1
+#define TEST_SELECT 0
+
 int main()
 {
 	int ret = 0;
 
-	printf("sys_net test v0.1.0 by GalCiv\n");
+	printf("sys_net test v0.2.0 by GalCiv\n");
 
 	ret = cellSysmoduleLoadModule(CELL_SYSMODULE_NET);
 	if (ret < 0)
@@ -28,6 +31,8 @@ int main()
 
 	memset(&tparams, 0, sizeof(tparams));
 	tparams.need_connect = 1;
+	tparams.test_poll = TEST_POLL;
+	tparams.test_select = TEST_SELECT;
 	tparams.socket_type = SOCK_STREAM;
 	inet_aton("127.0.0.1", &in_addr->sin_addr);
 	in_addr->sin_port = htons(3456);
@@ -36,6 +41,8 @@ int main()
 
 	memset(&tparams, 0, sizeof(tparams));
 	tparams.need_connect = 1;
+	tparams.test_poll = TEST_POLL;
+	tparams.test_select = TEST_SELECT;
 	tparams.socket_type = SOCK_STREAM_P2P;
 	inet_aton("127.0.0.1", &in_p2p_addr->sin_addr);
 	in_p2p_addr->sin_port = htons(3555);
@@ -45,6 +52,8 @@ int main()
 
 	memset(&tparams, 0, sizeof(tparams));
 	tparams.need_connect = 0;
+	tparams.test_poll = TEST_POLL;
+	tparams.test_select = TEST_SELECT;
 	tparams.socket_type = SOCK_DGRAM;
 	inet_aton("127.0.0.1", &in_addr->sin_addr);
 	in_addr->sin_port = htons(3456);
@@ -56,6 +65,8 @@ int main()
 
 	memset(&tparams, 0, sizeof(tparams));
 	tparams.need_connect = 0;
+	tparams.test_poll = TEST_POLL;
+	tparams.test_select = TEST_SELECT;
 	tparams.socket_type = SOCK_DGRAM_P2P;
 	inet_aton("127.0.0.1", &in_p2p_addr->sin_addr);
 	in_p2p_addr->sin_port = htons(3658);

@@ -13,6 +13,8 @@ typedef struct _test_parameters {
 	struct sockaddr addr;
 	struct sockaddr client_addr;
 	int need_connect;
+	int test_poll;
+	int test_select;
 } test_parameters;
 
 #endif
