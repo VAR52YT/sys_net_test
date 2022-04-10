@@ -5,6 +5,7 @@
 #include "test_parameters.h"
 
 int run_test(char *name, test_parameters *tparams);
+int run_simple_tests();
 
 #define TEST_POLL 1
 #define TEST_SELECT 0
@@ -13,7 +14,7 @@ int main()
 {
 	int ret = 0;
 
-	printf("sys_net test v0.2.0 by GalCiv\n");
+	printf("sys_net test v0.3.0 by GalCiv\n");
 
 	ret = cellSysmoduleLoadModule(CELL_SYSMODULE_NET);
 	if (ret < 0)
@@ -22,6 +23,8 @@ int main()
 	}
 
 	sys_net_initialize_network();
+
+	run_simple_tests();
 
 	test_parameters tparams;
 	struct sockaddr_in *in_addr = (struct sockaddr_in *)&tparams.addr;

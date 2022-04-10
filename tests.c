@@ -381,12 +381,20 @@ cleanup:
 	{
 		sys_ppu_thread_join(thread_server, &ret_value);
 		printf("Joined server thread with ret value %d\n", ret_value);
+		if (ret_value != 0 && ret == 0)
+		{
+			ret = ret_value;
+		}
 	}
 
 	if (thread_client)
 	{
 		sys_ppu_thread_join(thread_client, &ret_value);
 		printf("Joined client thread with ret value %d\n", ret_value);
+		if (ret_value != 0 && ret == 0)
+		{
+			ret = ret_value;
+		}
 	}
 
 	printf("Test %s completed with return value %d\n", name, ret);
